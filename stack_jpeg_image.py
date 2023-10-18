@@ -73,8 +73,8 @@
 
 import vtk
 
-# 첫 번째 JPEG 파일 경로 설정
-jpeg_file_path1 = r"C:\sin\스타2 ai\히페리온0.jpg"  # JPEG 파일 경로를 입력하세요.
+# 첫 번째 JPEG 파일 경로 설정 #검은색.jpg
+jpeg_file_path1 = r"C:\sin\스타2 ai\히페리온_80\히페리온_80 - 복사본.jpg"  # JPEG 파일 경로를 입력하세요.
 
 # 첫 번째 JPEG 파일 읽기
 jpeg_reader1 = vtk.vtkJPEGReader() #JPEG 읽기 위한 객체 생성
@@ -108,7 +108,7 @@ print(stacked_image.GetPreserveExtents())#현재 설정된 이미지 스택을 �
 # 원본 이미지를 읽어오고 복사하여 스택에 추가
 for i in range(n):
     jpeg_reader = vtk.vtkJPEGReader()
-    jpeg_reader.SetFileName(f"C:/sin/스타2 ai/히페리온{3+(i%2)}.jpg")  # 다음 이미지 파일 경로 설정
+    jpeg_reader.SetFileName(jpeg_file_path1)  # 다음 이미지 파일 경로 설정
     jpeg_reader.Update()
 
     # 이미지를 복사하여 스택에 추가
@@ -186,3 +186,16 @@ iren.Start() #이벤트 루프를 시작하고 사용자 입력을 처리함, �
 # # 렌더링 윈도우 표시
 # renWin.Render()
 # iren.Start()
+
+
+# VTK XML 파일 작성기 생성
+writer = vtk.vtkXMLImageDataWriter()
+writer.SetFileName("sc2_3d_object.vti")  # 출력 파일 이름과 형식을 지정합니다 (VTI는 VTK 이미지 데이터를 위한 형식)
+
+# 입력 데이터를 스택된 3D 객체로 설정
+writer.SetInputData(vtk_image_data)
+
+# 데이터를 파일로 쓰기
+writer.Write()
+
+print("end")
