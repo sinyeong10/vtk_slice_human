@@ -85,7 +85,7 @@ ren.AddViewProp(volume)
 
 
 base = [2048//2-1,1152//2-1,100//2-1]
-top = [base[0]+300,base[1]+300,base[2]+300]
+top = [base[0]+300,base[1]+300,base[2]+0]
 front = [base[0]+0,base[1]+2000,base[2]+0]
 
 renWin.AddRenderer(ren)
