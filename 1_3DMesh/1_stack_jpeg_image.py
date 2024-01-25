@@ -74,7 +74,7 @@
 import vtk
 
 # 첫 번째 JPEG 파일 경로 설정 #검은색.jpg
-jpeg_file_path1 = r"C:\sin\스타2 ai\히페리온_80\히페리온_80 - 복사본.jpg"  # JPEG 파일 경로를 입력하세요.
+jpeg_file_path1 = r"C:\sin\sc2ai\히페리온_80\히페리온_80 - 복사본.jpg"  # JPEG 파일 경로를 입력하세요.
 
 # 첫 번째 JPEG 파일 읽기
 jpeg_reader1 = vtk.vtkJPEGReader() #JPEG 읽기 위한 객체 생성
@@ -90,7 +90,7 @@ dims = image1.GetDimensions() #객체의 차원 정보 반환 받음, x,y,z축�
 
 
 # 두 이미지를 결합하여 Z 축 방향으로 스택
-n = 200 #z축 슬라이스 깊이
+n = 100 #z축 슬라이스 깊이
 
 #chat GPT는 vtkImageData()를 활용하는 방법을 설명해줬는데 잘 안됨
 # stacked_image = vtk.vtkImageData()
