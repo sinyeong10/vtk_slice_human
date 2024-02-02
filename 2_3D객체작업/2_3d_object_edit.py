@@ -2,7 +2,7 @@ import vtk
 #이전에 만든 3D 객체 읽어옴
 # Create a reader for the saved VTK XML file
 reader = vtk.vtkXMLImageDataReader()
-reader.SetFileName(r"C:\sin\vtk\slice_human\sc2_3d_object.vti")  # Specify the path to the saved VTI file
+reader.SetFileName(r"C:\sin\vtk\slice_human\updown.vti")  # Specify the path to the saved VTI file
 # Read the data
 reader.Update()
 # Get the loaded vtkImageData
@@ -26,10 +26,6 @@ max_coords = [origin[i] + (dimensions[i] - 1) * spacing[i] for i in range(3)]
 # 'origin' contains the minimum coordinates for X, Y, and Z axes.
 print(max_coords)
 #[2047.0, 1151.0, 99.0]은 0부터 시작하므로 2048 x 1152 x 100를 의미
-
-
-
-
 
 
 
@@ -75,13 +71,16 @@ ren.AddViewProp(volume)
 
 
 
+point_1 = (500,500,10)
+point_2 = (500,500,500)
+
+
 
 #지정 좌표에 점을 넣음
 # Define the coordinates for the red point (replace with your desired coordinates)
-x_coord = 500
-y_coord = 500
-z_coord = 10
+x_coord, y_coord, z_coord = point_1
 
+#구로 시각화
 # Create a red sphere source (a point)
 sphere_source = vtk.vtkSphereSource()
 sphere_source.SetCenter(x_coord, y_coord, z_coord)
@@ -102,9 +101,9 @@ ren.AddActor(point_actor)
 
 
 
-#선 생성
+#선 시각화
 # Create a line from the starting point to the ending point
-end_point = [500.0, 500.0, 500.0]
+end_point = point_2
 
 line_source = vtk.vtkLineSource()
 line_source.SetPoint1([x_coord, y_coord, z_coord])
@@ -128,12 +127,13 @@ ren.AddActor(line_actor)
 # Create a plane using the blue line as the normal vector
 plane = vtk.vtkPlane()
 plane.SetOrigin(x_coord, y_coord, z_coord)
-plane.SetNormal(end_point[0] - x_coord, end_point[1] - y_coord, end_point[2] - z_coord)
+plane.SetNormal(point_2[0] - x_coord, point_2[1] - y_coord, point_2[2] - z_coord)
 
 # Create a cutter and set the plane
 cutter = vtk.vtkCutter()
 cutter.SetInputData(loaded_vtk_image_data)  # Use your loaded vtkImageData here
 cutter.SetCutFunction(plane)
+#여기서 cutter.Update()는 렌더링 루프에서 내부적으로 처리됨
 
 # Create mapper for the cut object
 cutter_mapper = vtk.vtkPolyDataMapper()
@@ -158,91 +158,6 @@ iren.Start()
 # Now, save the cut object (plane) as a VTK file
 plane_writer = vtk.vtkXMLPolyDataWriter()
 plane_writer.SetInputData(cutter.GetOutput())
-plane_writer.SetFileName("test_cut.vtp")  # Specify the path and filename for the saved file
+plane_writer.SetFileName(f"test_cut.vtp")  # Specify the path and filename for the saved file
 plane_writer.Write()
-
-
-#지정 좌표에 점을 넣음
-# Define the coordinates for the red point (replace with your desired coordinates)
-x_coord = 0
-y_coord = 0
-z_coord = 100
-
-# Create a red sphere source (a point)
-sphere_source = vtk.vtkSphereSource()
-sphere_source.SetCenter(x_coord, y_coord, z_coord)
-sphere_source.SetRadius(50)  # Adjust the size as needed
-
-# Create polydata
-point_mapper = vtk.vtkPolyDataMapper()
-point_mapper.SetInputConnection(sphere_source.GetOutputPort())
-
-# Create an actor for the point
-point_actor = vtk.vtkActor()
-point_actor.SetMapper(point_mapper)
-point_actor.GetProperty().SetColor(1, 0, 0)  # Set color to red (RGB values)
-point_actor.GetProperty().SetOpacity(1.0) #투명도 조절
-
-# Add the point actor to the renderer
-ren.AddActor(point_actor)
-
-
-
-#선 생성
-# Create a line from the starting point to the ending point
-end_point = [500.0, 500.0, 500.0]
-
-line_source = vtk.vtkLineSource()
-line_source.SetPoint1([x_coord, y_coord, z_coord])
-line_source.SetPoint2(end_point)
-
-# Create polydata for the line
-line_mapper = vtk.vtkPolyDataMapper()
-line_mapper.SetInputConnection(line_source.GetOutputPort())
-
-# Create an actor for the line
-line_actor = vtk.vtkActor()
-line_actor.SetMapper(line_mapper)
-line_actor.GetProperty().SetColor(0, 0, 1)  # Set color to blue (RGB values)
-line_actor.GetProperty().SetLineWidth(2.0)  # Set line width
-
-# Add the line actor to the renderer
-ren.AddActor(line_actor)
-
-
-
-# Create a plane using the blue line as the normal vector
-plane = vtk.vtkPlane()
-plane.SetOrigin(x_coord, y_coord, z_coord)
-plane.SetNormal(end_point[0] - x_coord, end_point[1] - y_coord, end_point[2] - z_coord)
-
-# Create a cutter and set the plane
-cutter = vtk.vtkCutter()
-cutter.SetInputData(loaded_vtk_image_data)  # Use your loaded vtkImageData here
-cutter.SetCutFunction(plane)
-
-# Create mapper for the cut object
-cutter_mapper = vtk.vtkPolyDataMapper()
-cutter_mapper.SetInputConnection(cutter.GetOutputPort())
-
-# Create actor for the cut object
-cutter_actor = vtk.vtkActor()
-cutter_actor.SetMapper(cutter_mapper)
-
-# Add the cut object to the renderer
-ren.AddActor(cutter_actor)
-
-# Set up the rendering environment
-renWin.Render()
-
-# Start the interaction
-iren.Start()
-
-
-
-#짜른 평면 저장
-# Now, save the cut object (plane) as a VTK file
-plane_writer = vtk.vtkXMLPolyDataWriter()
-plane_writer.SetInputData(cutter.GetOutput())
-plane_writer.SetFileName("test_cut2.vtp")  # Specify the path and filename for the saved file
-plane_writer.Write()
+print(f"end")
