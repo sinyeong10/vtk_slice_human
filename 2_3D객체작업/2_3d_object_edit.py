@@ -13,7 +13,7 @@ loaded_vtk_image_data = reader.GetOutput()
 # 3d 객체의 차원 값을 읽어옴
 # Get the dimensions of the loaded vtkImageData
 dimensions = loaded_vtk_image_data.GetDimensions()
-print(dimensions)
+print("차원값 :",dimensions)
 
 # Get the origin (minimum coordinates) of the data
 origin = loaded_vtk_image_data.GetOrigin()
@@ -24,7 +24,7 @@ max_coords = [origin[i] + (dimensions[i] - 1) * spacing[i] for i in range(3)]
 
 # The 'max_coords' list now contains the maximum coordinates for X, Y, and Z axes.
 # 'origin' contains the minimum coordinates for X, Y, and Z axes.
-print(max_coords)
+print("여기에 1더한게 차원", max_coords)
 #[2047.0, 1151.0, 99.0]은 0부터 시작하므로 2048 x 1152 x 100를 의미
 
 
@@ -44,6 +44,52 @@ renWin.AddRenderer(ren)
 # Create a render window interactor
 iren = vtk.vtkRenderWindowInteractor()
 iren.SetRenderWindow(renWin)
+
+
+#카메라 0,0,0세팅
+# Create a camera and set its position and focal point
+camera = vtk.vtkCamera()
+camera.SetPosition(1000, 1000, 1000)  # Set camera position
+camera.SetFocalPoint(0, 0, 0)  # Set focal point
+
+# Set the camera to the renderer
+ren.SetActiveCamera(camera)
+
+
+# Define coordinates for the lines
+line_coords = [
+    [(0, 0, 0), (0, 0, 600)],
+    [(0, 0, 0), (0, 600, 0)],
+    [(0, 0, 0), (600, 0, 0)]
+]
+
+# Define colors for the lines
+line_colors = [
+    [1, 0, 0],  # Red
+    [0, 1, 0],  # Green
+    [0, 0, 1]   # Blue
+]
+
+# Create and add lines to the renderer
+for i in range(3):
+    # Create a line source
+    line_source = vtk.vtkLineSource()
+    line_source.SetPoint1(line_coords[i][0])
+    line_source.SetPoint2(line_coords[i][1])
+
+    # Create polydata for the line
+    line_mapper = vtk.vtkPolyDataMapper()
+    line_mapper.SetInputConnection(line_source.GetOutputPort())
+
+    # Create an actor for the line
+    line_actor = vtk.vtkActor()
+    line_actor.SetMapper(line_mapper)
+    line_actor.GetProperty().SetColor(line_colors[i])  # Set color
+    line_actor.GetProperty().SetLineWidth(2.0)  # Set line width
+
+    # Add the line actor to the renderer
+    ren.AddActor(line_actor)
+
 
 # Create a volume property
 volume_property = vtk.vtkVolumeProperty()
@@ -71,8 +117,9 @@ ren.AddViewProp(volume)
 
 
 
-point_1 = (500,500,10)
-point_2 = (500,500,500)
+point_1 = (250,250,0)#(500,500,10) #구의 중심!
+direct = (2,4,6)
+point_2 = (250+direct[0]*100,250+direct[1]*100,10+direct[2]*100)
 
 
 
@@ -84,7 +131,7 @@ x_coord, y_coord, z_coord = point_1
 # Create a red sphere source (a point)
 sphere_source = vtk.vtkSphereSource()
 sphere_source.SetCenter(x_coord, y_coord, z_coord)
-sphere_source.SetRadius(50)  # Adjust the size as needed
+sphere_source.SetRadius(10)  # Adjust the size as needed
 
 # Create polydata
 point_mapper = vtk.vtkPolyDataMapper()
@@ -105,6 +152,15 @@ ren.AddActor(point_actor)
 # Create a line from the starting point to the ending point
 end_point = point_2
 
+import numpy as np
+
+# 벡터의 크기 계산
+vector_length = np.sqrt((point_2[0] - x_coord)**2 + (point_2[1] - y_coord)**2 + (point_2[2] - z_coord)**2)
+print(point_1, point_2, vector_length)
+print(f"({(point_2[0] - x_coord)}, {(point_2[1] - y_coord)}, {(point_2[2] - z_coord)})")
+#법선벡터로 쓸 방향벡터
+print(f"({(point_2[0] - x_coord)/vector_length}, {(point_2[1] - y_coord)/vector_length}, {(point_2[2] - z_coord)/vector_length})")
+#point_1에서 point_2까지의 선분
 line_source = vtk.vtkLineSource()
 line_source.SetPoint1([x_coord, y_coord, z_coord])
 line_source.SetPoint2(end_point)
@@ -127,7 +183,7 @@ ren.AddActor(line_actor)
 # Create a plane using the blue line as the normal vector
 plane = vtk.vtkPlane()
 plane.SetOrigin(x_coord, y_coord, z_coord)
-plane.SetNormal(point_2[0] - x_coord, point_2[1] - y_coord, point_2[2] - z_coord)
+plane.SetNormal(point_2[0] - x_coord, point_2[1] - y_coord, point_2[2] - z_coord) #방향벡터를 법선 벡터로
 
 # Create a cutter and set the plane
 cutter = vtk.vtkCutter()
